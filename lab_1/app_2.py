@@ -2,7 +2,7 @@ import cv2
 from matplotlib import pyplot as plt
 
 img1 = cv2.imread('./assets/histogram_1.jpg', cv2.IMREAD_COLOR)
-imgi = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
+img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
 img2 = cv2.imread('./assets/histogram_2.jpg', cv2.IMREAD_COLOR)
 img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
 

@@ -6,7 +6,7 @@ from skimage.transform import rescale
 from skimage.util import random_noise
 
 img1 = cv2.imread('./assets/histogram_1.jpg', cv2.IMREAD_GRAYSCALE)
-ing1 = rescale(img1, 0.15)
+img1 = rescale(img1, 0.15)
 
 img_ns = random_noise(img1, mode='speckle', mean=0.1)
 
