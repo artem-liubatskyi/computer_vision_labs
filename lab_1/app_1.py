@@ -1,60 +1,44 @@
 # imports
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
 
-# read image
+# read images
 bright = cv2.imread("./assets/bright.jpg")
 dark = cv2.imread("./assets/dark.jpg")
 
-brightLAB = cv2.cvtColor(bright, cv2.COLOR_BGR2LAB)
-darkLAB = cv2.cvtColor(dark, cv2.COLOR_BGR2LAB)
 
-brightYCB = cv2.cvtColor(bright, cv2.COLOR_BGR2YCrCb)
-darkYCB = cv2.cvtColor(dark, cv2.COLOR_BGR2YCrCb)
+def apply_filter(image, filter: int):
+    bgr = [40, 158, 16]
+    thresh = 40
 
-brightHSV = cv2.cvtColor(bright, cv2.COLOR_BGR2HSV)
-darkHSV = cv2.cvtColor(dark, cv2.COLOR_BGR2HSV)
+    filteredImage = image
+    filteredBgr = bgr
 
-bgr = [40, 158, 16]
-thresh = 40
+    if filter is not None:
+        filteredImage = cv2.cvtColor(image, filter)
+        filteredBgr = cv2.cvtColor(
+            np.uint8([[bgr]]), filter)[0][0]
 
-minBGR = np.array([bgr[0] - thresh, bgr[1] - thresh, bgr[2] - thresh])
-maxBGR = np.array([bgr[0] + thresh, bgr[1] + thresh, bgr[2] + thresh])
+    min = np.array([filteredBgr[0] - thresh,
+                   filteredBgr[1] - thresh, filteredBgr[2] - thresh])
+    max = np.array([filteredBgr[0] + thresh,
+                   filteredBgr[1] + thresh, filteredBgr[2] + thresh])
 
-maskBGR = cv2.inRange(bright, minBGR, maxBGR)
-resultBGR = cv2.bitwise_and(bright, bright, mask=maskBGR)
+    mask = cv2.inRange(filteredImage, min, max)
+    return cv2.bitwise_and(filteredImage, filteredImage, mask=mask)
 
-# convert 1D array to 3D, then convert it to HSV and take the first element
-# this will be same as shown in the above figure [65, 229, 158]
-hsv = cv2.cvtColor(np.uint8([[bgr]]), cv2.COLOR_BGR2HSV)[0][0]
 
-minHSV = np.array([hsv[0] - thresh, hsv[1] - thresh, hsv[2] - thresh])
-maxHSV = np.array([hsv[0] + thresh, hsv[1] + thresh, hsv[2] + thresh])
+labels = ["Result BGR", "Result HSV", "Result YCB", "Result LAB"]
+filters = [None, cv2.COLOR_BGR2HSV, cv2.COLOR_BGR2YCrCb, cv2.COLOR_BGR2LAB]
 
-maskHSV = cv2.inRange(brightHSV, minHSV, maxHSV)
-resultHSV = cv2.bitwise_and(brightHSV, brightHSV, mask=maskHSV)
+figs, axes = plt.subplots(2, 4, figsize=(20, 10))
 
-# convert 10 array to 3D, then convert it to YCrCb and take the first element
-ycb = cv2.cvtColor(np.uint8([[bgr]]), cv2.COLOR_BGR2YCrCb)[0][0]
+for i, filter in enumerate(filters):
+    axes[0][i].imshow(apply_filter(bright, filter))
+    axes[0][i].set_title("Bright - " + labels[i])
 
-minYCB = np.array([ycb[0] - thresh, ycb[1] - thresh, ycb[2] - thresh])
-maxYCB = np.array([ycb[0] + thresh, ycb[1] + thresh, ycb[2] + thresh])
+    axes[1][i].imshow(apply_filter(dark, filter))
+    axes[1][i].set_title("Dark - " + labels[i])
 
-maskYCB = cv2.inRange(brightYCB, minYCB, maxYCB)
-resultYCB = cv2.bitwise_and(brightYCB, brightYCB, mask=maskYCB)
-
-# convert 1D array to 3D, then convert it to LAB and take the first element
-lab = cv2.cvtColor(np.uint8([[bgr]]), cv2.COLOR_BGR2LAB)[0][0]
-
-minLAB = np.array([lab[0] - thresh, lab[1] - thresh, lab[2] - thresh])
-maxLAB = np.array([lab[0] + thresh, lab[1] + thresh, lab[2] + thresh])
-
-maskLAB = cv2.inRange(brightLAB, minLAB, maxLAB)
-resultLAB = cv2.bitwise_and(brightLAB, brightLAB, mask=maskLAB)
-
-cv2.imshow("Result BGR", resultBGR)
-cv2.imshow("Result HSV", resultHSV)
-cv2.imshow("Result YCB", resultYCB)
-cv2.imshow("Output LAB", resultLAB)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+plt.show()

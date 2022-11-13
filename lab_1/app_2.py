@@ -17,7 +17,7 @@ plt.title('Image 2')
 plt.subplot(2, 2, 3)
 plt.hist(img1.ravel(), 256, [0, 256])
 plt.xlabel('Intensity, (0..255)')
-plt.ylabel('Count, pc3')
+plt.ylabel('Count, pcs')
 plt.title('Histogram of image')
 
 plt.subplot(2, 2, 4)
