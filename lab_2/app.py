@@ -21,34 +21,34 @@ def renderPatches(patches, label_prefix, offset):
         ax.set_xlabel(label_prefix+' %d' % (i + 1))
 
 
-def renderSourceImage(source_image, locations_a, locations_b):
+def renderSourceImage(source_image, firstTextureLocations, secondTextureLocations):
     ax = fig.add_subplot(3, 2, 1)
     ax.imshow(source_image, cmap=plt.cm.gray, vmin=0, vmax=255)
 
-    for (y, x) in locations_a:
+    for (y, x) in firstTextureLocations:
         ax.plot(x + PATCH_SIZE / 2, y + PATCH_SIZE / 2, 'gs')
 
-    for (y, x) in locations_b:
+    for (y, x) in secondTextureLocations:
         ax.plot(x + PATCH_SIZE / 2, y + PATCH_SIZE / 2, 'bs')
 
     ax.set_xlabel('Source image')
 
 
-def renderGlcm(patches_a, patches_b):
+def renderGlcm(firstTexturePatches, secondTexturePatches):
     xs = []
     ys = []
 
-    for patch in (patches_a + patches_b):
+    for patch in (firstTexturePatches + secondTexturePatches):
         glcm = greycomatrix(patch, distances=[5], angles=[
             0], levels=256, symmetric=True, normed=True)
         xs.append(greycoprops(glcm, 'dissimilarity')[0, 0])
         ys.append(greycoprops(glcm, 'correlation')[0, 0])
 
     ax = fig.add_subplot(3, 2, 2)
-    ax.plot(xs[:len(patches_a)], ys[:len(
-        patches_a)], 'go', label='Land')
-    ax.plot(xs[len(patches_a):],
-            ys[len(patches_a):], 'bo', label='Sea')
+    ax.plot(xs[:len(firstTexturePatches)], ys[:len(
+        firstTexturePatches)], 'go', label='Land')
+    ax.plot(xs[len(secondTexturePatches):],
+            ys[len(secondTexturePatches):], 'bo', label='Sea')
     ax.set_xlabel('GLCM Dissimilarity')
     ax.set_ylabel('GLCM Correlation')
     ax.legend()
@@ -68,6 +68,5 @@ renderGlcm(land_patches, sea_patches)
 renderPatches(land_patches, "Land", 1)
 renderPatches(sea_patches, "Sea", 2)
 
-fig.suptitle('Grey level co-occurrence matrix features', fontsize=14, y=1.05)
 plt.tight_layout()
 plt.show()
